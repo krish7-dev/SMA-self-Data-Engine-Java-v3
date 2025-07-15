@@ -1,6 +1,7 @@
 package com.marketdata.db;
 
 import com.marketdata.model.Tick;
+import com.marketdata.util.FileTickLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,28 +18,34 @@ public class TickQuery {
 
     private final JdbcTemplate jdbcTemplate;
     private final PartitionManager partitionManager;
+    private final FileTickLogger fileLogger;
 
     @Autowired
-    public TickQuery(JdbcTemplate jdbcTemplate, PartitionManager partitionManager) {
+    public TickQuery(JdbcTemplate jdbcTemplate, PartitionManager partitionManager, FileTickLogger fileTickLogger) {
         this.jdbcTemplate = jdbcTemplate;
         this.partitionManager = partitionManager;
+        this.fileLogger = fileTickLogger;
     }
 
     public void save(Tick tick) {
         partitionManager.ensurePartitionExists(tick.getSymbol());
 
         String sql = "INSERT INTO ticks (symbol, price, volume, timestamp, exchange, source) VALUES (?, ?, ?, ?, ?, ?)";
-
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, tick.getSymbol());
-            ps.setDouble(2, tick.getPrice());
-            ps.setInt(3, (int) tick.getVolume());
-            ps.setTimestamp(4, Timestamp.from(tick.getTimestamp()));
-            ps.setString(5, tick.getExchange());
-            ps.setString(6,tick.getSource().name());
-            return ps;
-        });
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(sql);
+                ps.setString(1, tick.getSymbol());
+                ps.setDouble(2, tick.getPrice());
+                ps.setInt(3, (int) tick.getVolume());
+                ps.setTimestamp(4, Timestamp.from(tick.getTimestamp()));
+                ps.setString(5, tick.getExchange());
+                ps.setString(6, tick.getSource().name());
+                return ps;
+            });
+        } catch (Exception e){
+            System.out.println("Error in writing to db");
+            fileLogger.logTick(tick);
+        }
     }
 
     public List<Tick> getRecentTicks(String symbol, int limit) {

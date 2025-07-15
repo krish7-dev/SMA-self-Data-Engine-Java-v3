@@ -1,6 +1,5 @@
 package com.marketdata.engine;
 
-
 import com.marketdata.db.SymbolQuery;
 import com.marketdata.enums.TickSource;
 import com.marketdata.model.Tick;
@@ -21,13 +20,16 @@ public class KiteStreamer {
     private final TickQueue tickQueue;
     private final SymbolQuery symbolQuery;
 
+    // ✅ Add the list of symbols you want to stream here
+    private final List<String> symbolsToStream = List.of("TCS", "RELIANCE", "ADANIGREEN","NIFTY50");
+//    private final List<String> symbolsToStream = List.of("TCS");
+
     public KiteStreamer(KiteConnect kiteConnect, TickQueue tickQueue, SymbolQuery symbolQuery) {
         this.kiteConnect = kiteConnect;
         this.tickQueue = tickQueue;
         this.symbolQuery = symbolQuery;
     }
 
-    // Call this ONLY after login success
     public void startStreaming() {
         try {
             if (kiteConnect.getAccessToken() == null) {
@@ -46,8 +48,7 @@ public class KiteStreamer {
             throw new RuntimeException(e);
         }
 
-        KiteTicker ticker = new KiteTicker(kiteConnect.getApiKey(), kiteConnect.getAccessToken());
-
+        KiteTicker ticker = new KiteTicker(kiteConnect.getAccessToken(),kiteConnect.getApiKey());
         try {
             ticker.setTryReconnection(true);
         } catch (Exception e) {
@@ -64,11 +65,30 @@ public class KiteStreamer {
                 System.err.println("⚠️ Failed to set retry params: " + e.getMessage());
             }
 
-            List<Long> tokensToSubscribe = List.of(256265L, 260105L);
-            ArrayList<Long> tokenList = new ArrayList<>(tokensToSubscribe);
+            // ✅ Convert symbol list to token list using DB
+            ArrayList<Long> tokenList = new ArrayList<>();
+
+            for (String symbol : symbolsToStream) {
+                String tokenStr = symbolQuery.getToken(symbol); // <--- this method must be added
+                if (tokenStr != null) {
+                    try {
+                        tokenList.add(Long.parseLong(tokenStr));
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("❌ Invalid token format for symbol " + symbol + ": " + tokenStr);
+                    }
+                } else {
+                    System.err.println("⚠️ No token found for symbol: " + symbol);
+                }
+            }
+
+            if (tokenList.isEmpty()) {
+                System.err.println("❌ No valid tokens to subscribe to. Streaming aborted.");
+                return;
+            }
 
             ticker.subscribe(tokenList);
             ticker.setMode(tokenList, KiteTicker.modeFull);
+            System.out.println("📡 Subscribed to tokens: " + tokenList);
         });
 
         ticker.setOnTickerArrivalListener(ticks -> {
@@ -102,13 +122,13 @@ public class KiteStreamer {
                         : Instant.ofEpochMilli(System.currentTimeMillis())
         );
 
-        // ✅ Use SymbolQuery to get symbol from DB
-        String symbol = symbolQuery.getSymbol(String.valueOf(token));
+        // ✅ Reverse lookup: get symbol from token
+        String symbol = symbolQuery.getInstrumentNameFromToken(String.valueOf(token));
         tick.setSymbol(symbol != null ? symbol : "UNKNOWN");
-        tick.setExchange("NSE");                  // hardcode or lookup if needed
-        tick.setSource(TickSource.kite);          // set your enum value
+
+        tick.setExchange("NSE");
+        tick.setSource(TickSource.kite);
 
         return tick;
     }
-
 }

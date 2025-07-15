@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class SymbolQuery {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -13,12 +14,24 @@ public class SymbolQuery {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public String getSymbol(String instrument) {
+    // 🔁 Get token from symbol name
+    public String getToken(String symbol) {
         String sql = "SELECT kite FROM symbols WHERE instrument = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{instrument}, String.class);
+            return jdbcTemplate.queryForObject(sql, new Object[]{symbol}, String.class);
         } catch (Exception e) {
-            // You can log or handle the error as needed
+            System.err.println("⚠️ Symbol not found: " + symbol);
+            return null;
+        }
+    }
+
+    // 🔁 Get symbol name from token
+    public String getInstrumentNameFromToken(String token) {
+        String sql = "SELECT instrument FROM symbols WHERE kite = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{token}, String.class);
+        } catch (Exception e) {
+            System.err.println("⚠️ Token not found: " + token);
             return null;
         }
     }

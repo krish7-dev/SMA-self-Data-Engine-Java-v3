@@ -1,5 +1,6 @@
 package com.marketdata.auth;
 
+import com.marketdata.config.KiteConfig;
 import com.marketdata.engine.KiteStreamer;
 import com.zerodhatech.kiteconnect.KiteConnect;
 import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
@@ -21,10 +22,12 @@ public class KiteLogin {
 
     private final KiteConnect kiteConnect;
     private final KiteStreamer kiteStreamer;
+    private final KiteConfig kiteConfig;
 
-    public KiteLogin(KiteConnect kiteConnect, KiteStreamer kiteStreamer) {
+    public KiteLogin(KiteConnect kiteConnect, KiteStreamer kiteStreamer, KiteConfig kiteConfig) {
         this.kiteConnect = kiteConnect;
         this.kiteStreamer = kiteStreamer;
+        this.kiteConfig = kiteConfig;
     }
 
     @GetMapping("/kite")
@@ -53,9 +56,9 @@ public class KiteLogin {
             System.out.println("✅ Public Token: " + publicToken);
 
             // ✅ Start WebSocket streaming now that token is valid
-            kiteStreamer.startStreaming();
-
-            return "✅ Login successful. Tokens saved. Streaming started.";
+//            kiteStreamer.startStreaming();
+            kiteConfig.kiteConnect();
+            return "✅ Login successful. Tokens saved. Calling config.";
 
         } catch (KiteException e) {
             System.out.println("❌ KiteException occurred:");
