@@ -37,40 +37,27 @@ public class KiteLogin {
             System.out.println("🔑 Using API key: " + kiteConnect.getApiKey());
 
             User user = kiteConnect.generateSession(requestToken, apiSecret);
+            if (user == null) return "❌ User session is null.";
 
-            if (user == null) {
-                System.out.println("❌ User object is null");
-                return "❌ User session is null. Check request_token or apiSecret.";
-            }
+            kiteConnect.setAccessToken(user.accessToken);
+            kiteConnect.setPublicToken(user.publicToken);
 
-            String accessToken = user.accessToken;
-            String publicToken = user.publicToken;
+            Files.writeString(Paths.get("kite.access.token"), user.accessToken);
+            Files.writeString(Paths.get("kite.public.token"), user.publicToken);
 
-            kiteConnect.setAccessToken(accessToken);
-            kiteConnect.setPublicToken(publicToken);
+            System.out.println("✅ Tokens saved.");
 
-            Files.writeString(Paths.get("kite.access.token"), accessToken);
-            Files.writeString(Paths.get("kite.public.token"), publicToken);
-
-            System.out.println("✅ Access Token: " + accessToken);
-            System.out.println("✅ Public Token: " + publicToken);
-
-            // ✅ Start WebSocket streaming now that token is valid
-//            kiteStreamer.startStreaming();
-            kiteConfig.kiteConnect();
-            return "✅ Login successful. Tokens saved. Calling config.";
+            // ✅ Now configure and start
+            boolean success = kiteConfig.configureAndStart(kiteConnect);
+            return success ? "✅ Streaming started." : "⚠️ Token error.";
 
         } catch (KiteException e) {
-            System.out.println("❌ KiteException occurred:");
-            System.out.println("🧾 Code: " + e.code);
-            System.out.println("📄 Message: " + e.message);
             return "❌ KiteException: " + e.message;
         } catch (IOException e) {
-            e.printStackTrace();
             return "❌ IO Exception: " + e.getMessage();
         } catch (Exception e) {
-            e.printStackTrace();
             return "❌ Unexpected error: " + e.getMessage();
         }
     }
+
 }

@@ -7,6 +7,7 @@ import com.zerodhatech.kiteconnect.KiteConnect;
 import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
 import com.zerodhatech.models.Profile;
 import com.zerodhatech.ticker.KiteTicker;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -16,39 +17,39 @@ import java.util.List;
 @Service
 public class KiteStreamer {
 
-    private final KiteConnect kiteConnect;
+    private final ObjectProvider<KiteConnect> kiteConnectProvider;
     private final TickQueue tickQueue;
     private final SymbolQuery symbolQuery;
 
-    // ✅ Add the list of symbols you want to stream here
-    private final List<String> symbolsToStream = List.of("TCS", "RELIANCE", "ADANIGREEN","NIFTY50");
-//    private final List<String> symbolsToStream = List.of("TCS");
+    private final List<String> symbolsToStream = List.of("TCS", "RELIANCE", "ADANIGREEN", "NIFTY50");
 
-    public KiteStreamer(KiteConnect kiteConnect, TickQueue tickQueue, SymbolQuery symbolQuery) {
-        this.kiteConnect = kiteConnect;
+    public KiteStreamer(ObjectProvider<KiteConnect> kiteConnectProvider,
+                        TickQueue tickQueue,
+                        SymbolQuery symbolQuery) {
+        this.kiteConnectProvider = kiteConnectProvider;
         this.tickQueue = tickQueue;
         this.symbolQuery = symbolQuery;
     }
 
     public void startStreaming() {
-        try {
-            if (kiteConnect.getAccessToken() == null) {
-                System.out.println("⚠️ Access token not available. Login first.");
-                return;
-            }
+        KiteConnect kiteConnect = kiteConnectProvider.getIfAvailable();
 
+        if (kiteConnect == null || kiteConnect.getAccessToken() == null) {
+            System.out.println("⚠️ Access token not available. Login first.");
+            return;
+        }
+
+        try {
             // Validate session
             Profile profile = kiteConnect.getProfile();
             System.out.println("👤 Logged in as: " + profile.userName);
-
-        } catch (Exception e) {
+        } catch (Exception | KiteException e) {
             System.err.println("❌ Access token invalid or expired: " + e.getMessage());
             return;
-        } catch (KiteException e) {
-            throw new RuntimeException(e);
         }
 
-        KiteTicker ticker = new KiteTicker(kiteConnect.getAccessToken(),kiteConnect.getApiKey());
+        KiteTicker ticker = new KiteTicker(kiteConnect.getAccessToken(), kiteConnect.getApiKey());
+
         try {
             ticker.setTryReconnection(true);
         } catch (Exception e) {
@@ -65,11 +66,10 @@ public class KiteStreamer {
                 System.err.println("⚠️ Failed to set retry params: " + e.getMessage());
             }
 
-            // ✅ Convert symbol list to token list using DB
             ArrayList<Long> tokenList = new ArrayList<>();
 
             for (String symbol : symbolsToStream) {
-                String tokenStr = symbolQuery.getToken(symbol); // <--- this method must be added
+                String tokenStr = symbolQuery.getToken(symbol);
                 if (tokenStr != null) {
                     try {
                         tokenList.add(Long.parseLong(tokenStr));
@@ -122,7 +122,6 @@ public class KiteStreamer {
                         : Instant.ofEpochMilli(System.currentTimeMillis())
         );
 
-        // ✅ Reverse lookup: get symbol from token
         String symbol = symbolQuery.getInstrumentNameFromToken(String.valueOf(token));
         tick.setSymbol(symbol != null ? symbol : "UNKNOWN");
 
