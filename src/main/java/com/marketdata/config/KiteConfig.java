@@ -24,12 +24,6 @@ public class KiteConfig {
     @Value("${kite.userId}")
     private String userId;
 
-    private final KiteStreamer kiteStreamer;
-
-    public KiteConfig(KiteStreamer kiteStreamer){
-        this.kiteStreamer = kiteStreamer;
-    }
-
     public String getApiSecret() {
         return apiSecret;
     }
@@ -43,7 +37,7 @@ public class KiteConfig {
         Path publicTokenPath = Path.of("kite.public.token");
 
         if (Files.exists(accessTokenPath) && Files.exists(publicTokenPath)) {
-            try{
+
                 String accessToken = Files.readString(accessTokenPath).trim();
                 String publicToken = Files.readString(publicTokenPath).trim();
 
@@ -51,13 +45,6 @@ public class KiteConfig {
                 kiteConnect.setPublicToken(publicToken);
 
                 System.out.println("✅ Loaded access token from file.");
-                Profile profile = kiteConnect.getProfile();
-                System.out.println("Valid Token for user : " + profile.userName);
-                System.out.println("Starting Streaming from Config : ");
-                kiteStreamer.startStreaming();
-            } catch (Exception | KiteException e){
-
-            }
 
         } else {
             System.out.println("⚠️ Token files not found. Please login via /login/kite");

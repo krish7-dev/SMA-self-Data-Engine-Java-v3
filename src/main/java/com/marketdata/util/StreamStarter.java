@@ -17,6 +17,6 @@ public class StreamStarter {
     @PostConstruct
     public void startStreamIfTokenPresent() {
         System.out.println("🟢 StreamStarter initialized. Starting KiteStreamer...");
-//        kiteStreamer.startStreaming();
+        kiteStreamer.startStreaming();
     }
 }
