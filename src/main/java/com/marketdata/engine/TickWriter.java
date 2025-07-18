@@ -3,7 +3,6 @@ package com.marketdata.engine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketdata.db.TickQuery;
 import com.marketdata.model.Tick;
-import com.marketdata.util.FileTickLogger;
 import com.marketdata.util.MetricsCollector;
 import com.marketdata.websocket.TickWebSocketHandler;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import java.time.ZonedDateTime;
 public class TickWriter {
 
     private final TickQueue tickQueue;
-    private final FileTickLogger fileLogger;
     private final TickQuery tickQuery;
     private final MetricsCollector metrics;
     private final TickWebSocketHandler webSocketHandler;
@@ -30,14 +28,12 @@ public class TickWriter {
 
     public TickWriter(
             TickQueue tickQueue,
-            FileTickLogger fileLogger,
             MetricsCollector metrics,
             TickQuery tickQuery,
             TickWebSocketHandler webSocketHandler,
             ObjectMapper objectMapper // ✅ injected
     ) {
         this.tickQueue = tickQueue;
-        this.fileLogger = fileLogger;
         this.metrics = metrics;
         this.tickQuery = tickQuery;
         this.webSocketHandler = webSocketHandler;
@@ -75,7 +71,6 @@ public class TickWriter {
                 return;
             }
             System.out.println("💾 Writing tick: " + tick);
-//            fileLogger.logTick(tick);
             tickQuery.save(tick);
             metrics.incrementWritten();
 

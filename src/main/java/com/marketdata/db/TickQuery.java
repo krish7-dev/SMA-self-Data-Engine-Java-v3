@@ -1,7 +1,6 @@
 package com.marketdata.db;
 
 import com.marketdata.model.Tick;
-import com.marketdata.util.FileTickLogger;
 import com.marketdata.enums.TickSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,13 +18,11 @@ public class TickQuery {
 
     private final JdbcTemplate jdbcTemplate;
     private final PartitionManager partitionManager;
-    private final FileTickLogger fileLogger;
 
     @Autowired
-    public TickQuery(JdbcTemplate jdbcTemplate, PartitionManager partitionManager, FileTickLogger fileTickLogger) {
+    public TickQuery(JdbcTemplate jdbcTemplate, PartitionManager partitionManager) {
         this.jdbcTemplate = jdbcTemplate;
         this.partitionManager = partitionManager;
-        this.fileLogger = fileTickLogger;
     }
 
     /**
@@ -53,7 +50,7 @@ public class TickQuery {
             });
         } catch (Exception e) {
             System.out.println("Error in writing to DB for tick: " + tick.getSymbol() + " — " + e.getMessage());
-            fileLogger.logTick(tick); // Fallback to file if DB fails
+//            fileLogger.logTick(tick); // Fallback to file if DB fails
         }
     }
 

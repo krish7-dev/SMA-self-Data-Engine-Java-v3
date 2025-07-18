@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.time.LocalDate;
 
-@Component
+
 public class FileArchiverService {
 
     private static final String LOG_DIR = "tick_log/";
