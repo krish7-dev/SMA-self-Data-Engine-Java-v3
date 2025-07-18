@@ -1,16 +1,10 @@
 package com.marketdata.config;
 
-import com.marketdata.engine.KiteStreamer;
+import com.marketdata.db.TokenQuery;
 import com.zerodhatech.kiteconnect.KiteConnect;
-import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
-import com.zerodhatech.models.Profile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Configuration
 public class KiteConfig {
@@ -18,36 +12,34 @@ public class KiteConfig {
     @Value("${kite.apiKey}")
     private String apiKey;
 
-    @Value("${kite.apiSecret}")
-    private String apiSecret; // ✅ MISSING — this caused NullPointerException
-
     @Value("${kite.userId}")
     private String userId;
 
-    public String getApiSecret() {
-        return apiSecret;
+    private final TokenQuery tokenQuery;
+
+    // Constructor injection (preferred for Spring)
+    public KiteConfig(TokenQuery tokenQuery) {
+        this.tokenQuery = tokenQuery;
     }
 
     @Bean
-    public KiteConnect kiteConnect() throws IOException {
+    public KiteConnect kiteConnect() {
         KiteConnect kiteConnect = new KiteConnect(apiKey);
         kiteConnect.setUserId(userId);
 
-        Path accessTokenPath = Path.of("kite.access.token");
-        Path publicTokenPath = Path.of("kite.public.token");
+        try {
+            String accessToken = tokenQuery.getLatestAccessToken();
+            String publicToken = tokenQuery.getLatestPublicToken();
 
-        if (Files.exists(accessTokenPath) && Files.exists(publicTokenPath)) {
-
-                String accessToken = Files.readString(accessTokenPath).trim();
-                String publicToken = Files.readString(publicTokenPath).trim();
-
+            if (accessToken != null && publicToken != null) {
                 kiteConnect.setAccessToken(accessToken);
                 kiteConnect.setPublicToken(publicToken);
-
-                System.out.println("✅ Loaded access token from file.");
-
-        } else {
-            System.out.println("⚠️ Token files not found. Please login via /login/kite");
+                System.out.println("✅ Loaded access/public token from database.");
+            } else {
+                System.out.println("⚠️ No tokens found in DB. Please login via /login/kite");
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Failed to load tokens from DB: " + e.getMessage());
         }
 
         return kiteConnect;
