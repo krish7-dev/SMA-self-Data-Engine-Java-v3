@@ -33,10 +33,15 @@ public class TickReplay {
             try {
                 List<Tick> ticks = tickQuery.getRecentTicks(symbol, 500);
                 for (Tick tick : ticks) {
-                    if (!running) break;
+                    if (!running || Thread.currentThread().isInterrupted()) break;
                     String json = objectMapper.writeValueAsString(tick);
-                    tickWebSocketHandler.broadcast(json); // ✅ correct usage
-                    Thread.sleep(300); // adjustable replay speed
+                    tickWebSocketHandler.broadcast(json);
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        System.out.println("⛔ Replay thread interrupted during sleep.");
+                        break; // Exit the loop cleanly
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
