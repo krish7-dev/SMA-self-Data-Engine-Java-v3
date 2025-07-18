@@ -3,7 +3,6 @@ package com.marketdata.util;
 
 import com.marketdata.engine.TickQueue;
 import com.marketdata.model.Tick;
-import com.marketdata.util.FileTickLogger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -12,11 +11,9 @@ import javax.annotation.PreDestroy;
 public class ShutDownDBWriter {
 
     private final TickQueue tickQueue;
-    private final FileTickLogger fileLogger;
 
-    public ShutDownDBWriter(TickQueue tickQueue, FileTickLogger fileLogger) {
+    public ShutDownDBWriter(TickQueue tickQueue) {
         this.tickQueue = tickQueue;
-        this.fileLogger = fileLogger;
     }
 
     @PreDestroy
@@ -29,7 +26,6 @@ public class ShutDownDBWriter {
         for (int i = 0; i < remaining; i++) {
             try {
                 Tick tick = tickQueue.dequeue();
-                fileLogger.logTick(tick); // fallback log
                 System.out.println("💾 Flushed tick on shutdown: " + tick);
             } catch (InterruptedException e) {
                 System.err.println("⚠️ Interrupted while flushing ticks.");

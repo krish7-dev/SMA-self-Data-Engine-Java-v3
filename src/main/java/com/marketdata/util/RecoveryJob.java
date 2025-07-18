@@ -12,7 +12,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.stream.Stream;
 
-@Component
+
 public class RecoveryJob {
 
     private static final String LOG_DIR = "tick_log/";
