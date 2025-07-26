@@ -10,6 +10,7 @@ import com.zerodhatech.models.Profile;
 import com.zerodhatech.ticker.KiteTicker;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
