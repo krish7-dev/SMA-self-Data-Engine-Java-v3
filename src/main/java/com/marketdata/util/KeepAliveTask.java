@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 public class KeepAliveTask {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private static final String URL = "http://localhost:7000/api/health";
+    private static final String URL = "https://sma-de-v3.onrender.com/api/health";
 
     KeepAliveTask(){
         System.out.println("✅ Starting Scheduler");
