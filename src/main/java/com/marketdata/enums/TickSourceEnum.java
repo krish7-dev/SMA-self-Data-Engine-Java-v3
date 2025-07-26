@@ -1,4 +1,8 @@
 package com.marketdata.enums;
 
-public class TickSourceEnum {
+public enum TickSourceEnum {
+    kite,
+    upstox,
+    post,
+    UNKNOWN
 }
