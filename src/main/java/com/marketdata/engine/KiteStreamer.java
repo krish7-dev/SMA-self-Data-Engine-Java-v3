@@ -94,6 +94,7 @@ public class KiteStreamer {
         ticker.setOnTickerArrivalListener(ticks -> {
             for (com.zerodhatech.models.Tick kiteTick : ticks) {
                 Tick myTick = convertToCustomTick(kiteTick);
+//                System.out.println("custom tick : "+myTick);
                 tickQueue.enqueue(myTick);
             }
         });
@@ -110,25 +111,54 @@ public class KiteStreamer {
     private Tick convertToCustomTick(com.zerodhatech.models.Tick kiteTick) {
         Tick tick = new Tick();
 
-        long token = kiteTick.getInstrumentToken();
-        tick.setInstrumentToken(token);
-        tick.setPrice(kiteTick.getLastTradedPrice());
-        tick.setLastTradedQuantity(kiteTick.getLastTradedQuantity());
-        tick.setVolume(kiteTick.getVolumeTradedToday());
+        // Fields directly from Kite Tick
+        tick.setMode(kiteTick.getMode());
+        tick.setTradable(kiteTick.isTradable());
+        tick.setInstrumentToken(kiteTick.getInstrumentToken());
+        tick.setLastTradedPrice(kiteTick.getLastTradedPrice());
+        tick.setHighPrice(kiteTick.getHighPrice());
+        tick.setLowPrice(kiteTick.getLowPrice());
+        tick.setOpenPrice(kiteTick.getOpenPrice());
+        tick.setClosePrice(kiteTick.getClosePrice());
+        tick.setChange(kiteTick.getChange());
 
-        tick.setTimestamp(
-                kiteTick.getTickTimestamp() != null
-                        ? kiteTick.getTickTimestamp().toInstant()
-                        : Instant.ofEpochMilli(System.currentTimeMillis())
+        // Per-trade volume (instant) and cumulative day volume
+        tick.setLastTradedQuantity(kiteTick.getLastTradedQuantity());
+        tick.setInstantVolume(kiteTick.getLastTradedQuantity());  // Explicit per-tick volume
+        tick.setCumulativeVolume(kiteTick.getVolumeTradedToday()); // Running total
+
+        tick.setAverageTradePrice(kiteTick.getAverageTradePrice());
+        tick.setTotalBuyQuantity(kiteTick.getTotalBuyQuantity());
+        tick.setTotalSellQuantity(kiteTick.getTotalSellQuantity());
+
+        tick.setLastTradedTime(
+                kiteTick.getLastTradedTime() != null
+                        ? kiteTick.getLastTradedTime().toInstant()
+                        : null
         );
 
-        // ✅ Reverse lookup: get symbol from token
-        String symbol = symbolQuery.getInstrumentNameFromToken(String.valueOf(token));
+        tick.setOi(kiteTick.getOi());
+        tick.setOpenInterestDayHigh(kiteTick.getOpenInterestDayHigh());
+        tick.setOpenInterestDayLow(kiteTick.getOpenInterestDayLow());
+
+        tick.setTickTimestamp(
+                kiteTick.getTickTimestamp() != null
+                        ? kiteTick.getTickTimestamp().toInstant()
+                        : java.time.Instant.now()
+        );
+
+//        tick.setDepth(kiteTick.getMarketDepth());
+
+        // Reverse lookup for symbol (token → name mapping)
+        String symbol = symbolQuery.getInstrumentNameFromToken(
+                String.valueOf(kiteTick.getInstrumentToken())
+        );
         tick.setSymbol(symbol != null ? symbol : "UNKNOWN");
 
-        tick.setExchange("NSE");
+        tick.setExchange("NSE"); // Assuming NSE for all, adjust if needed
         tick.setSource(TickSource.kite);
 
         return tick;
     }
+
 }

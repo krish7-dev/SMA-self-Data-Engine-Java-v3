@@ -1,89 +1,89 @@
 package com.marketdata.model;
 
 import com.marketdata.enums.TickSource;
+import com.zerodhatech.models.Depth;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class Tick {
 
-    private String symbol;
-    private double price;
-    private long volume;
-    private Instant timestamp;
-    private String exchange;
-    private TickSource source;
-
+    // Fields from Kite Tick
+    private String mode;
+    private boolean tradable;
     private long instrumentToken;
-    private double lastTradedQuantity;
-    private double averageTradePrice;
-    private double openPrice;
+    private double lastTradedPrice;
     private double highPrice;
     private double lowPrice;
+    private double openPrice;
     private double closePrice;
     private double change;
-    private long totalBuyQuantity;
-    private long totalSellQuantity;
+    private double lastTradedQuantity;   // raw trade size from Kite
+    private double instantVolume;        // per-tick volume (same as lastTradedQuantity, explicit for ML)
+    private long cumulativeVolume;       // volumeTradedToday from Kite (running total)
+    private double averageTradePrice;
+    private double totalBuyQuantity;
+    private double totalSellQuantity;
+    private Instant lastTradedTime;
     private double oi;
     private double openInterestDayHigh;
     private double openInterestDayLow;
+    private Instant tickTimestamp;
 
+    // Our additional fields
+    private String symbol;
+    private String exchange;
+    private TickSource source;
+
+    // Default constructor
     public Tick() {}
 
-    public Tick(String symbol, double price, long volume, Instant timestamp, String exchange, TickSource source,
-                long instrumentToken, double lastTradedQuantity, double averageTradePrice, double openPrice,
-                double highPrice, double lowPrice, double closePrice, double change, long totalBuyQuantity,
-                long totalSellQuantity, double oi, double openInterestDayHigh, double openInterestDayLow) {
-        this.symbol = symbol;
-        this.price = price;
-        this.volume = volume;
-        this.timestamp = timestamp;
-        this.exchange = exchange;
-        this.source = source;
+    // All-fields constructor
+    public Tick(String mode, boolean tradable, long instrumentToken, double lastTradedPrice, double highPrice,
+                double lowPrice, double openPrice, double closePrice, double change, double lastTradedQuantity,
+                double instantVolume, long cumulativeVolume, double averageTradePrice, double totalBuyQuantity,
+                double totalSellQuantity, Instant lastTradedTime, double oi, double openInterestDayHigh,
+                double openInterestDayLow, Instant tickTimestamp,
+                String symbol, String exchange, TickSource source) {
+
+        this.mode = mode;
+        this.tradable = tradable;
         this.instrumentToken = instrumentToken;
-        this.lastTradedQuantity = lastTradedQuantity;
-        this.averageTradePrice = averageTradePrice;
-        this.openPrice = openPrice;
+        this.lastTradedPrice = lastTradedPrice;
         this.highPrice = highPrice;
         this.lowPrice = lowPrice;
+        this.openPrice = openPrice;
         this.closePrice = closePrice;
         this.change = change;
+        this.lastTradedQuantity = lastTradedQuantity;
+        this.instantVolume = instantVolume;
+        this.cumulativeVolume = cumulativeVolume;
+        this.averageTradePrice = averageTradePrice;
         this.totalBuyQuantity = totalBuyQuantity;
         this.totalSellQuantity = totalSellQuantity;
+        this.lastTradedTime = lastTradedTime;
         this.oi = oi;
         this.openInterestDayHigh = openInterestDayHigh;
         this.openInterestDayLow = openInterestDayLow;
+        this.tickTimestamp = tickTimestamp;
+        this.symbol = symbol;
+        this.exchange = exchange;
+        this.source = source;
     }
 
+    // Getters & Setters
+    public String getMode() { return mode; }
+    public void setMode(String mode) { this.mode = mode; }
 
-    public String getSymbol() { return symbol; }
-    public void setSymbol(String symbol) { this.symbol = symbol; }
-
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
-
-    public long getVolume() { return volume; }
-    public void setVolume(long volume) { this.volume = volume; }
-
-    public Instant getTimestamp() { return timestamp; }
-    public void setTimestamp(Instant timestamp) { this.timestamp = timestamp; }
-
-    public String getExchange() { return exchange; }
-    public void setExchange(String exchange) { this.exchange = exchange; }
-
-    public TickSource getSource() { return source; }
-    public void setSource(TickSource source) { this.source = source; }
+    public boolean isTradable() { return tradable; }
+    public void setTradable(boolean tradable) { this.tradable = tradable; }
 
     public long getInstrumentToken() { return instrumentToken; }
     public void setInstrumentToken(long instrumentToken) { this.instrumentToken = instrumentToken; }
 
-    public double getLastTradedQuantity() { return lastTradedQuantity; }
-    public void setLastTradedQuantity(double lastTradedQuantity) { this.lastTradedQuantity = lastTradedQuantity; }
-
-    public double getAverageTradePrice() { return averageTradePrice; }
-    public void setAverageTradePrice(double averageTradePrice) { this.averageTradePrice = averageTradePrice; }
-
-    public double getOpenPrice() { return openPrice; }
-    public void setOpenPrice(double openPrice) { this.openPrice = openPrice; }
+    public double getLastTradedPrice() { return lastTradedPrice; }
+    public void setLastTradedPrice(double lastTradedPrice) { this.lastTradedPrice = lastTradedPrice; }
 
     public double getHighPrice() { return highPrice; }
     public void setHighPrice(double highPrice) { this.highPrice = highPrice; }
@@ -91,17 +91,38 @@ public class Tick {
     public double getLowPrice() { return lowPrice; }
     public void setLowPrice(double lowPrice) { this.lowPrice = lowPrice; }
 
+    public double getOpenPrice() { return openPrice; }
+    public void setOpenPrice(double openPrice) { this.openPrice = openPrice; }
+
     public double getClosePrice() { return closePrice; }
     public void setClosePrice(double closePrice) { this.closePrice = closePrice; }
 
     public double getChange() { return change; }
     public void setChange(double change) { this.change = change; }
 
-    public long getTotalBuyQuantity() { return totalBuyQuantity; }
-    public void setTotalBuyQuantity(long totalBuyQuantity) { this.totalBuyQuantity = totalBuyQuantity; }
+    public double getLastTradedQuantity() { return lastTradedQuantity; }
+    public void setLastTradedQuantity(double lastTradedQuantity) {
+        this.lastTradedQuantity = lastTradedQuantity;
+        this.instantVolume = lastTradedQuantity;  // Keep in sync
+    }
 
-    public long getTotalSellQuantity() { return totalSellQuantity; }
-    public void setTotalSellQuantity(long totalSellQuantity) { this.totalSellQuantity = totalSellQuantity; }
+    public double getInstantVolume() { return instantVolume; }
+    public void setInstantVolume(double instantVolume) { this.instantVolume = instantVolume; }
+
+    public long getCumulativeVolume() { return cumulativeVolume; }
+    public void setCumulativeVolume(long cumulativeVolume) { this.cumulativeVolume = cumulativeVolume; }
+
+    public double getAverageTradePrice() { return averageTradePrice; }
+    public void setAverageTradePrice(double averageTradePrice) { this.averageTradePrice = averageTradePrice; }
+
+    public double getTotalBuyQuantity() { return totalBuyQuantity; }
+    public void setTotalBuyQuantity(double totalBuyQuantity) { this.totalBuyQuantity = totalBuyQuantity; }
+
+    public double getTotalSellQuantity() { return totalSellQuantity; }
+    public void setTotalSellQuantity(double totalSellQuantity) { this.totalSellQuantity = totalSellQuantity; }
+
+    public Instant getLastTradedTime() { return lastTradedTime; }
+    public void setLastTradedTime(Instant lastTradedTime) { this.lastTradedTime = lastTradedTime; }
 
     public double getOi() { return oi; }
     public void setOi(double oi) { this.oi = oi; }
@@ -112,28 +133,44 @@ public class Tick {
     public double getOpenInterestDayLow() { return openInterestDayLow; }
     public void setOpenInterestDayLow(double openInterestDayLow) { this.openInterestDayLow = openInterestDayLow; }
 
+    public Instant getTickTimestamp() { return tickTimestamp; }
+    public void setTickTimestamp(Instant tickTimestamp) { this.tickTimestamp = tickTimestamp; }
+
+    public String getSymbol() { return symbol; }
+    public void setSymbol(String symbol) { this.symbol = symbol; }
+
+    public String getExchange() { return exchange; }
+    public void setExchange(String exchange) { this.exchange = exchange; }
+
+    public TickSource getSource() { return source; }
+    public void setSource(TickSource source) { this.source = source; }
+
     @Override
     public String toString() {
         return "Tick{" +
                 "symbol='" + symbol + '\'' +
-                ", price=" + price +
-                ", volume=" + volume +
-                ", timestamp=" + timestamp +
-                ", exchange='" + exchange + '\'' +
-                ", source='" + source + '\'' +
+                ", mode='" + mode + '\'' +
+                ", tradable=" + tradable +
                 ", instrumentToken=" + instrumentToken +
-                ", lastTradedQuantity=" + lastTradedQuantity +
-                ", averageTradePrice=" + averageTradePrice +
-                ", openPrice=" + openPrice +
+                ", lastTradedPrice=" + lastTradedPrice +
                 ", highPrice=" + highPrice +
                 ", lowPrice=" + lowPrice +
+                ", openPrice=" + openPrice +
                 ", closePrice=" + closePrice +
                 ", change=" + change +
+                ", lastTradedQuantity=" + lastTradedQuantity +
+                ", instantVolume=" + instantVolume +
+                ", cumulativeVolume=" + cumulativeVolume +
+                ", averageTradePrice=" + averageTradePrice +
                 ", totalBuyQuantity=" + totalBuyQuantity +
                 ", totalSellQuantity=" + totalSellQuantity +
+                ", lastTradedTime=" + lastTradedTime +
                 ", oi=" + oi +
                 ", openInterestDayHigh=" + openInterestDayHigh +
                 ", openInterestDayLow=" + openInterestDayLow +
+                ", tickTimestamp=" + tickTimestamp +
+                ", exchange='" + exchange + '\'' +
+                ", source=" + source +
                 '}';
     }
 }
