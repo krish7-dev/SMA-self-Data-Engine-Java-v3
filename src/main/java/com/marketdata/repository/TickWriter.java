@@ -68,7 +68,7 @@ public class TickWriter {
         try {
             if (isWithinMarketHours(tick.getTickTimestamp())) {
                 System.out.println("⏱️ Ignored tick outside market hours: " + tick);
-                return;
+//                return;
             }
             System.out.println("💾 Writing tick: " + tick);
             tickQuery.save(tick);
