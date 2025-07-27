@@ -14,12 +14,27 @@ public class KeepAliveTask {
     private final RestTemplate restTemplate = new RestTemplate();
 
     KeepAliveTask(){
-        System.out.println("✅ Starting Scheduler");
+        System.out.println("✅ Starting Scheduler (default: enabled)");
+    }
+
+    // Flag to control scheduler
+    private volatile boolean enabled = true;
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     // Run every 5 minutes between 9:15 AM and 3:30 PM (IST)
     @Scheduled(cron = "0 */10 * * * MON-FRI", zone = "UTC")  // 3-10 UTC = 8:30-15:30 IST (adjust buffer if needed)
     public void pingSelf() {
+        if (!enabled) {
+            System.out.println("⏸️ Scheduler paused, skipping ping...");
+            return;
+        }
         try {
             restTemplate.getForObject(healthUrl, String.class);
             System.out.println("Pinged self to stay alive : "+healthUrl);
