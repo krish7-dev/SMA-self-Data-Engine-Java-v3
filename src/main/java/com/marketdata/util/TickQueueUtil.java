@@ -1,4 +1,4 @@
-package com.marketdata.engine;
+package com.marketdata.util;
 
 import com.marketdata.model.Tick;
 import org.springframework.stereotype.Component;
@@ -7,11 +7,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
-public class TickQueue {
-
+public class TickQueueUtil {
     private final BlockingQueue<Tick> queue = new LinkedBlockingQueue<>(100_000);
 
-    public TickQueue() {
+    public TickQueueUtil() {
         System.out.println("🧠 TickQueue instance created");
     }
 
@@ -30,5 +29,4 @@ public class TickQueue {
     public boolean isEmpty() {
         return queue.isEmpty();
     }
-
 }

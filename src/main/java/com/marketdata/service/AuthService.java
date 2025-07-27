@@ -1,16 +1,17 @@
-package com.marketdata.auth;
+package com.marketdata.service;
 
-import com.marketdata.engine.KiteStreamer;
-import com.marketdata.util.TokenService;  // TokenService uses TokenRepository internally
 import com.zerodhatech.kiteconnect.KiteConnect;
 import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
 import com.zerodhatech.models.User;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/login")
-public class KiteLogin {
+public class AuthService {
 
     @Value("${kite.apiSecret}")
     private String apiSecret;
@@ -19,7 +20,7 @@ public class KiteLogin {
     private final KiteConnect kiteConnect;
     private final KiteStreamer kiteStreamer;
 
-    public KiteLogin(KiteConnect kiteConnect, KiteStreamer kiteStreamer, TokenService tokenService) {
+    public AuthService(KiteConnect kiteConnect, KiteStreamer kiteStreamer, TokenService tokenService) {
         this.kiteConnect = kiteConnect;
         this.kiteStreamer = kiteStreamer;
         this.tokenService = tokenService;

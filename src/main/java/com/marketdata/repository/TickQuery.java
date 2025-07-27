@@ -1,8 +1,8 @@
-package com.marketdata.db;
+package com.marketdata.repository;
 
+
+import com.marketdata.enums.TickSourceEnum;
 import com.marketdata.model.Tick;
-import com.marketdata.enums.TickSource;
-import com.zerodhatech.models.Depth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,17 +20,14 @@ import java.util.Map;
 public class TickQuery {
 
     private final JdbcTemplate jdbcTemplate;
-    private final PartitionManager partitionManager;
+    private final PartitionManagerQuery partitionManager;
 
     @Autowired
-    public TickQuery(JdbcTemplate jdbcTemplate, PartitionManager partitionManager) {
+    public TickQuery(JdbcTemplate jdbcTemplate, PartitionManagerQuery partitionManager) {
         this.jdbcTemplate = jdbcTemplate;
         this.partitionManager = partitionManager;
     }
 
-    /**
-     * Save a tick to the database. Ensures the partition exists, then writes the full tick.
-     */
     public void save(Tick tick) {
         partitionManager.ensurePartitionExists(tick.getSymbol());
 
@@ -132,9 +129,9 @@ public class TickQuery {
         tick.setExchange(rs.getString("exchange"));
         String sourceStr = rs.getString("source");
         try {
-            tick.setSource(TickSource.valueOf(sourceStr));
+            tick.setSource(TickSourceEnum.valueOf(sourceStr));
         } catch (Exception e) {
-            tick.setSource(TickSource.UNKNOWN);
+            tick.setSource(TickSourceEnum.UNKNOWN);
         }
         return tick;
     };

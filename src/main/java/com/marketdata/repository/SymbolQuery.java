@@ -1,4 +1,4 @@
-package com.marketdata.db;
+package com.marketdata.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,7 +14,6 @@ public class SymbolQuery {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // 🔁 Get token from symbol name
     public String getToken(String symbol) {
         String sql = "SELECT kite FROM symbols WHERE instrument = ?";
         try {
@@ -25,7 +24,6 @@ public class SymbolQuery {
         }
     }
 
-    // 🔁 Get symbol name from token
     public String getInstrumentNameFromToken(String token) {
         String sql = "SELECT instrument FROM symbols WHERE kite = ?";
         try {

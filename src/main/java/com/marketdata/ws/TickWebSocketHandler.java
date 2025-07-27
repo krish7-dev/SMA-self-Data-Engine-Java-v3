@@ -1,4 +1,4 @@
-package com.marketdata.websocket;
+package com.marketdata.ws;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;

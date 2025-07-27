@@ -1,15 +1,16 @@
-package com.marketdata.engine;
+package com.marketdata.service;
 
-import com.marketdata.db.SymbolQuery;
-import com.marketdata.enums.TickSource;
+import com.marketdata.enums.TickSourceEnum;
 import com.marketdata.model.Tick;
+import com.marketdata.repository.SymbolQuery;
+import com.marketdata.util.TickQueueUtil;
 import com.zerodhatech.kiteconnect.KiteConnect;
 import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
 import com.zerodhatech.models.Profile;
 import com.zerodhatech.ticker.KiteTicker;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +18,12 @@ import java.util.List;
 public class KiteStreamer {
 
     private final KiteConnect kiteConnect;
-    private final TickQueue tickQueue;
+    private final TickQueueUtil tickQueue;
     private final SymbolQuery symbolQuery;
 
-    // ✅ Add the list of symbols you want to stream here
     private final List<String> symbolsToStream = List.of("TCS", "RELIANCE", "ADANIGREEN","NIFTY50");
-//    private final List<String> symbolsToStream = List.of("TCS");
 
-    public KiteStreamer(KiteConnect kiteConnect, TickQueue tickQueue, SymbolQuery symbolQuery) {
+    public KiteStreamer(KiteConnect kiteConnect, TickQueueUtil tickQueue, SymbolQuery symbolQuery) {
         this.kiteConnect = kiteConnect;
         this.tickQueue = tickQueue;
         this.symbolQuery = symbolQuery;
@@ -156,9 +155,8 @@ public class KiteStreamer {
         tick.setSymbol(symbol != null ? symbol : "UNKNOWN");
 
         tick.setExchange("NSE"); // Assuming NSE for all, adjust if needed
-        tick.setSource(TickSource.kite);
+        tick.setSource(TickSourceEnum.kite);
 
         return tick;
     }
-
 }

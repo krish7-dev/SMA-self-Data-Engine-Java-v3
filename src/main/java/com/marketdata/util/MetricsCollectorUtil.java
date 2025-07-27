@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
-public class MetricsCollector {
-
+public class MetricsCollectorUtil {
     private final AtomicInteger totalTicksReceived = new AtomicInteger();
     private final AtomicInteger totalTicksWritten = new AtomicInteger();
     private final AtomicInteger totalTickFailures = new AtomicInteger();

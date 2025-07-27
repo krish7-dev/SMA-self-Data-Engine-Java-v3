@@ -1,6 +1,6 @@
 package com.marketdata.config;
 
-import com.marketdata.db.TokenQuery;
+import com.marketdata.repository.TokenQuery;
 import com.zerodhatech.kiteconnect.KiteConnect;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

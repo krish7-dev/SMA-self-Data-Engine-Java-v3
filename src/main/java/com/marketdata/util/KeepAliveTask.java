@@ -1,5 +1,6 @@
 package com.marketdata.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -7,19 +8,36 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class KeepAliveTask {
 
+    @Value("${health.url}")  // inject from application-local or test
+    private String healthUrl;
+
     private final RestTemplate restTemplate = new RestTemplate();
-    private static final String URL = "https://sma-de-v3.onrender.com/api/health";
 
     KeepAliveTask(){
-        System.out.println("✅ Starting Scheduler");
+        System.out.println("✅ Starting Scheduler (default: enabled)");
+    }
+
+    // Flag to control scheduler
+    private volatile boolean enabled = true;
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     // Run every 5 minutes between 9:15 AM and 3:30 PM (IST)
-    @Scheduled(cron = "0 */1 3-10 * * MON-SAT", zone = "UTC")  // 3-10 UTC = 8:30-15:30 IST (adjust buffer if needed)
+    @Scheduled(cron = "0 */10 * * * MON-FRI", zone = "UTC")  // 3-10 UTC = 8:30-15:30 IST (adjust buffer if needed)
     public void pingSelf() {
+        if (!enabled) {
+            System.out.println("⏸️ Scheduler paused, skipping ping...");
+            return;
+        }
         try {
-            restTemplate.getForObject(URL, String.class);
-            System.out.println("Pinged self to stay alive");
+            restTemplate.getForObject(healthUrl, String.class);
+            System.out.println("Pinged self to stay alive : "+healthUrl);
         } catch (Exception e) {
             System.err.println("Failed to ping self: " + e.getMessage());
         }

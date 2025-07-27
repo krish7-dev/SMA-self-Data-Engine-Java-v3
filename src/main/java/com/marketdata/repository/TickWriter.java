@@ -1,10 +1,10 @@
-package com.marketdata.engine;
+package com.marketdata.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marketdata.db.TickQuery;
 import com.marketdata.model.Tick;
-import com.marketdata.util.MetricsCollector;
-import com.marketdata.websocket.TickWebSocketHandler;
+import com.marketdata.util.MetricsCollectorUtil;
+import com.marketdata.util.TickQueueUtil;
+import com.marketdata.ws.TickWebSocketHandler;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -17,18 +17,18 @@ import java.time.ZonedDateTime;
 @Service
 public class TickWriter {
 
-    private final TickQueue tickQueue;
+    private final TickQueueUtil tickQueue;
     private final TickQuery tickQuery;
-    private final MetricsCollector metrics;
+    private final MetricsCollectorUtil metrics;
     private final TickWebSocketHandler webSocketHandler;
-    private final ObjectMapper objectMapper; // ✅ injected mapper with JavaTimeModule
+    private final ObjectMapper objectMapper;
 
     private volatile boolean keepRunning = true;
     private Thread writerThread;
 
     public TickWriter(
-            TickQueue tickQueue,
-            MetricsCollector metrics,
+            TickQueueUtil tickQueue,
+            MetricsCollectorUtil metrics,
             TickQuery tickQuery,
             TickWebSocketHandler webSocketHandler,
             ObjectMapper objectMapper // ✅ injected
@@ -68,7 +68,7 @@ public class TickWriter {
         try {
             if (isWithinMarketHours(tick.getTickTimestamp())) {
                 System.out.println("⏱️ Ignored tick outside market hours: " + tick);
-                return;
+//                return;
             }
             System.out.println("💾 Writing tick: " + tick);
             tickQuery.save(tick);

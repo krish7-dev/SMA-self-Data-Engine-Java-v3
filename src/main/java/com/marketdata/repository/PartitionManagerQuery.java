@@ -1,16 +1,16 @@
-package com.marketdata.db;
+package com.marketdata.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PartitionManager {
+public class PartitionManagerQuery {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public PartitionManager(JdbcTemplate jdbcTemplate) {
+    public PartitionManagerQuery(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -21,9 +21,7 @@ public class PartitionManager {
         String existsQuery = "SELECT EXISTS (" +
                 "SELECT FROM pg_tables WHERE tablename = ?" +
                 ")";
-        boolean exists = Boolean.TRUE.equals(
-                jdbcTemplate.queryForObject(existsQuery, new Object[]{tableName}, Boolean.class)
-        );
+        boolean exists = jdbcTemplate.queryForObject(existsQuery, new Object[]{tableName}, Boolean.class);
 
         if (!exists) {
             // Create partition for the symbol

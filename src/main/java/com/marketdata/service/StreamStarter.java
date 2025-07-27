@@ -1,6 +1,5 @@
-package com.marketdata.util;
+package com.marketdata.service;
 
-import com.marketdata.engine.KiteStreamer;
 import com.zerodhatech.kiteconnect.KiteConnect;
 import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
 import org.springframework.stereotype.Service;

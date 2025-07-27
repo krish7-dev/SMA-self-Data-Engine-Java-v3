@@ -1,4 +1,4 @@
-package com.marketdata.db;
+package com.marketdata.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,7 +24,6 @@ public class TokenQuery {
         return jdbcTemplate.queryForObject(sql, String.class);
     }
 
-    // Function to insert or update tokens (always keep 1 row)
     public void saveTokens(String accessToken, String publicToken) {
         String sql = """
         INSERT INTO tokens (id, access_token, public_token, created_at)

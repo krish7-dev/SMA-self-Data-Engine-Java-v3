@@ -1,11 +1,8 @@
 package com.marketdata.model;
 
-import com.marketdata.enums.TickSource;
+import com.marketdata.enums.TickSourceEnum;
 import com.zerodhatech.models.Depth;
-
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Map;
 
 public class Tick {
 
@@ -34,7 +31,7 @@ public class Tick {
     // Our additional fields
     private String symbol;
     private String exchange;
-    private TickSource source;
+    private TickSourceEnum source;
 
     // Default constructor
     public Tick() {}
@@ -45,7 +42,7 @@ public class Tick {
                 double instantVolume, long cumulativeVolume, double averageTradePrice, double totalBuyQuantity,
                 double totalSellQuantity, Instant lastTradedTime, double oi, double openInterestDayHigh,
                 double openInterestDayLow, Instant tickTimestamp,
-                String symbol, String exchange, TickSource source) {
+                String symbol, String exchange, TickSourceEnum source) {
 
         this.mode = mode;
         this.tradable = tradable;
@@ -142,8 +139,8 @@ public class Tick {
     public String getExchange() { return exchange; }
     public void setExchange(String exchange) { this.exchange = exchange; }
 
-    public TickSource getSource() { return source; }
-    public void setSource(TickSource source) { this.source = source; }
+    public TickSourceEnum getSource() { return source; }
+    public void setSource(TickSourceEnum source) { this.source = source; }
 
     @Override
     public String toString() {

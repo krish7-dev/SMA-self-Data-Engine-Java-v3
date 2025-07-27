@@ -1,6 +1,6 @@
-package com.marketdata.util;
+package com.marketdata.service;
 
-import com.marketdata.db.TokenQuery;
+import com.marketdata.repository.TokenQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,4 +15,3 @@ public class TokenService {
         System.out.println("Tokens saved successfully!");
     }
 }
-
