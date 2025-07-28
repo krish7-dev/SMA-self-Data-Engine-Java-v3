@@ -3,6 +3,7 @@ package com.marketdata.model;
 import com.marketdata.enums.TickSourceEnum;
 import com.zerodhatech.models.Depth;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class Tick {
 
@@ -26,7 +27,7 @@ public class Tick {
     private double oi;
     private double openInterestDayHigh;
     private double openInterestDayLow;
-    private Instant tickTimestamp;
+    private LocalDateTime tickTimestamp;
 
     // Our additional fields
     private String symbol;
@@ -41,7 +42,7 @@ public class Tick {
                 double lowPrice, double openPrice, double closePrice, double change, double lastTradedQuantity,
                 double instantVolume, long cumulativeVolume, double averageTradePrice, double totalBuyQuantity,
                 double totalSellQuantity, Instant lastTradedTime, double oi, double openInterestDayHigh,
-                double openInterestDayLow, Instant tickTimestamp,
+                double openInterestDayLow, LocalDateTime tickTimestamp,
                 String symbol, String exchange, TickSourceEnum source) {
 
         this.mode = mode;
@@ -130,8 +131,8 @@ public class Tick {
     public double getOpenInterestDayLow() { return openInterestDayLow; }
     public void setOpenInterestDayLow(double openInterestDayLow) { this.openInterestDayLow = openInterestDayLow; }
 
-    public Instant getTickTimestamp() { return tickTimestamp; }
-    public void setTickTimestamp(Instant tickTimestamp) { this.tickTimestamp = tickTimestamp; }
+    public LocalDateTime getTickTimestamp() { return tickTimestamp; }
+    public void setTickTimestamp(LocalDateTime tickTimestamp) { this.tickTimestamp = tickTimestamp; }
 
     public String getSymbol() { return symbol; }
     public void setSymbol(String symbol) { this.symbol = symbol; }
