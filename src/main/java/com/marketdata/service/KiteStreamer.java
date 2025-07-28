@@ -11,6 +11,8 @@ import com.zerodhatech.ticker.KiteTicker;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,10 +142,12 @@ public class KiteStreamer {
         tick.setOpenInterestDayHigh(kiteTick.getOpenInterestDayHigh());
         tick.setOpenInterestDayLow(kiteTick.getOpenInterestDayLow());
 
+        ZoneId indiaZone = ZoneId.of("Asia/Kolkata");
+
         tick.setTickTimestamp(
                 kiteTick.getTickTimestamp() != null
-                        ? kiteTick.getTickTimestamp().toInstant()
-                        : java.time.Instant.now()
+                        ? kiteTick.getTickTimestamp().toInstant().atZone(indiaZone).toLocalDateTime()
+                        : LocalDateTime.now(indiaZone)
         );
 
 //        tick.setDepth(kiteTick.getMarketDepth());

@@ -47,7 +47,7 @@ public class TickQuery {
                 PreparedStatement ps = connection.prepareStatement(sql);
                 int idx = 1;
                 ps.setString(idx++, tick.getSymbol());
-                ps.setTimestamp(idx++, Timestamp.from(tick.getTickTimestamp()));
+                ps.setTimestamp(idx++, Timestamp.valueOf(tick.getTickTimestamp()));
                 ps.setLong(idx++, tick.getInstrumentToken());
                 ps.setDouble(idx++, tick.getLastTradedPrice());
                 ps.setDouble(idx++, tick.getOpenPrice());
@@ -103,7 +103,7 @@ public class TickQuery {
     private final RowMapper<Tick> tickRowMapper = (ResultSet rs, int rowNum) -> {
         Tick tick = new Tick();
         tick.setSymbol(rs.getString("symbol"));
-        tick.setTickTimestamp(rs.getTimestamp("tick_timestamp").toInstant());
+        tick.setTickTimestamp(rs.getTimestamp("tick_timestamp").toLocalDateTime());
         tick.setInstrumentToken(rs.getLong("instrument_token"));
         tick.setLastTradedPrice(rs.getDouble("last_traded_price"));
         tick.setOpenPrice(rs.getDouble("open_price"));

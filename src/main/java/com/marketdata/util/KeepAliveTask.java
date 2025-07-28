@@ -14,7 +14,7 @@ public class KeepAliveTask {
     private final RestTemplate restTemplate = new RestTemplate();
 
     KeepAliveTask(){
-        System.out.println("✅ Starting Scheduler (default: enabled)");
+        System.out.println("⏰ Starting Scheduler (default: enabled)");
     }
 
     // Flag to control scheduler

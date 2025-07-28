@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 
 @Service
 public class TickWriter {
@@ -84,15 +81,14 @@ public class TickWriter {
         }
     }
 
-    private boolean isWithinMarketHours(Instant timestamp) {
-        ZonedDateTime indiaTime = timestamp.atZone(ZoneId.of("Asia/Kolkata"));
-        LocalTime tickTime = indiaTime.toLocalTime();
-
+    private boolean isWithinMarketHours(LocalDateTime tickTime) {
         LocalTime marketOpen = LocalTime.of(9, 15);
         LocalTime marketClose = LocalTime.of(15, 30);
 
-        return !tickTime.isBefore(marketOpen) && !tickTime.isAfter(marketClose);
+        LocalTime time = tickTime.toLocalTime();
+        return !time.isBefore(marketOpen) && !time.isAfter(marketClose);
     }
+
 
 
     @PreDestroy
