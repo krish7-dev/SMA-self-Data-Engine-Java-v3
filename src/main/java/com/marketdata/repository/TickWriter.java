@@ -63,7 +63,7 @@ public class TickWriter {
 
     private void processTick(Tick tick) {
         try {
-            if (isWithinMarketHours(tick.getTickTimestamp())) {
+            if (!isWithinMarketHours(tick.getTickTimestamp())) {
                 System.out.println("⏱️ Ignored tick outside market hours: " + tick);
                 return;
             }
